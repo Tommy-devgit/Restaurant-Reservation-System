@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Restaurant Reservation System (Multi-Tenant SaaS)
 
-## Getting Started
+Production-style MVP for real-time table reservations built with Next.js, Firebase, and Tailwind CSS.
 
-First, run the development server:
+## Features
+
+- Multi-tenant data model by `restaurantId`
+- Real-time reservation updates with Firestore listeners
+- Double-booking prevention with interval conflict logic
+- Auto table assignment by smallest-fit capacity
+- Customer booking flow:
+	- Restaurant list
+	- Slot and availability check
+	- Booking form
+	- Confirmation and cancellation
+- Admin dashboard:
+	- Dashboard metrics
+	- Tables CRUD
+	- Reservations list + filters + cancellation
+	- Restaurant settings and working hours
+
+## Core Booking Rule
+
+Time conflict is detected with:
+
+`newStart < existingEnd && newEnd > existingStart`
+
+If true, reservation conflicts and cannot be created.
+
+## Tech Stack
+
+- Frontend: Next.js App Router + Tailwind CSS
+- Backend: Firebase Firestore + Firebase Auth
+- State/Fetching: TanStack React Query + Zustand
+- Validation: Zod + React Hook Form
+
+## Setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Configure env variables:
+
+```bash
+cp .env.example .env.local
+```
+
+3. Set Firebase values in `.env.local`.
+
+4. Run app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Firestore Configuration
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Security rules file: `firestore.rules`
+- Composite indexes file: `firestore.indexes.json`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Deploy using Firebase CLI in your project.
 
-## Learn More
+## Recommended Firestore Collections
 
-To learn more about Next.js, take a look at the following resources:
+- `users`
+- `restaurants`
+- `tables`
+- `reservations`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+See `types/domain.ts` for document contracts.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Folder Overview
 
-## Deploy on Vercel
+- `app/`: customer + admin pages
+- `components/`: UI building blocks
+- `services/`: Firestore query/mutation layer
+- `hooks/`: query and realtime hooks
+- `lib/`: Firebase bootstrap + time utilities
+- `types/`: domain models
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Performance Notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Availability checks query only `restaurantId + date` data
+- Composite indexes optimize reservation and table lookups
+- Query caching enabled via React Query default options
+
+## MVP Roadmap Alignment
+
+- Phase 1: Auth-ready structure, tables CRUD, reservation logic, availability check
+- Phase 2: Admin dashboard, slot generation, auto-assignment
+- Phase 3 (future): analytics, notifications, billing
