@@ -16,7 +16,8 @@ const tableSchema = z.object({
   capacity: z.coerce.number().int().min(1).max(20),
 });
 
-type TableForm = z.infer<typeof tableSchema>;
+type TableFormInput = z.input<typeof tableSchema>;
+type TableForm = z.output<typeof tableSchema>;
 
 export function TablesPanel({ restaurantId }: { restaurantId: string }) {
   const queryClient = useQueryClient();
@@ -27,7 +28,7 @@ export function TablesPanel({ restaurantId }: { restaurantId: string }) {
     enabled: Boolean(restaurantId),
   });
 
-  const form = useForm<TableForm>({
+  const form = useForm<TableFormInput, unknown, TableForm>({
     resolver: zodResolver(tableSchema),
     defaultValues: {
       tableNumber: "",

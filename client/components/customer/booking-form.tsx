@@ -16,7 +16,8 @@ const bookingSchema = z.object({
   guests: z.coerce.number().int().min(1).max(20),
 });
 
-type BookingFormData = z.infer<typeof bookingSchema>;
+type BookingFormInput = z.input<typeof bookingSchema>;
+type BookingFormData = z.output<typeof bookingSchema>;
 
 export function BookingForm() {
   const router = useRouter();
@@ -32,7 +33,7 @@ export function BookingForm() {
     [params],
   );
 
-  const form = useForm<BookingFormData>({
+  const form = useForm<BookingFormInput, unknown, BookingFormData>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
       customerName: "",
