@@ -16,9 +16,13 @@ export function RestaurantList() {
 
   if (!data?.length) {
     return (
-      <p className="rounded-2xl border border-dashed border-slate-300 p-6 text-slate-600">
-        No restaurants found. Add entries in Firestore to get started.
-      </p>
+      <div className="hotel-card rounded-3xl border-dashed p-6 text-[#593630]">
+        <p className="display-font text-3xl text-[#2b0d0a]">No hotel profile yet.</p>
+        <p className="mt-2 text-sm">
+          Create your hotel in the admin area, then guests can start booking
+          dining and appointment slots instantly.
+        </p>
+      </div>
     );
   }
 
@@ -27,18 +31,23 @@ export function RestaurantList() {
       {data.map((restaurant) => (
         <article
           key={restaurant.id}
-          className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
+          className="hotel-card rounded-3xl p-5"
         >
-          <h2 className="text-xl font-semibold text-slate-900">{restaurant.name}</h2>
-          <p className="mt-1 text-slate-600">{restaurant.location}</p>
-          <p className="mt-3 text-sm text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7f3a2f]">
+            Hotel Branch
+          </p>
+          <h2 className="display-font text-4xl leading-tight text-[#2b0d0a]">
+            {restaurant.name}
+          </h2>
+          <p className="mt-1 text-[#5d3c35]">{restaurant.location}</p>
+          <p className="mt-3 text-sm text-[#7a5750]">
             Hours: {restaurant.workingHours.open} - {restaurant.workingHours.close}
           </p>
           <Link
-            className="mt-4 inline-flex rounded-full bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700"
+            className="mt-4 inline-flex rounded-full bg-[#a4271f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#8e1f17]"
             href={`/restaurant/${restaurant.id}`}
           >
-            Reserve a Table
+            Book Appointment
           </Link>
         </article>
       ))}

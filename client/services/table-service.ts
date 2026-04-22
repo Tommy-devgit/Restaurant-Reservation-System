@@ -3,6 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   orderBy,
   query,
@@ -14,6 +15,16 @@ import type { RestaurantTable } from "@/types/domain";
 
 const tablesCol = collection(db, "tables");
 
+function normalizeTable(
+  tableId: string,
+  data: Omit<RestaurantTable, "id">,
+): RestaurantTable {
+  return {
+    id: tableId,
+    ...data,
+  };
+}
+
 export async function getTables(restaurantId: string): Promise<RestaurantTable[]> {
   const tablesQuery = query(
     tablesCol,
@@ -23,10 +34,29 @@ export async function getTables(restaurantId: string): Promise<RestaurantTable[]
 
   const snapshot = await getDocs(tablesQuery);
 
-  return snapshot.docs.map((item) => ({
-    id: item.id,
-    ...(item.data() as Omit<RestaurantTable, "id">),
-  }));
+  return snapshot.docs.map((item) =>
+    normalizeTable(item.id, item.data() as Omit<RestaurantTable, "id">),
+  );
+}
+
+export async function getAllTables(): Promise<RestaurantTable[]> {
+  const tablesQuery = query(tablesCol, orderBy("capacity", "asc"));
+  const snapshot = await getDocs(tablesQuery);
+
+  return snapshot.docs.map((item) =>
+    normalizeTable(item.id, item.data() as Omit<RestaurantTable, "id">),
+  );
+}
+
+export async function getTableById(tableId: string): Promise<RestaurantTable | null> {
+  const tableRef = doc(db, "tables", tableId);
+  const snapshot = await getDoc(tableRef);
+
+  if (!snapshot.exists()) {
+    return null;
+  }
+
+  return normalizeTable(snapshot.id, snapshot.data() as Omit<RestaurantTable, "id">);
 }
 
 export async function createTable(

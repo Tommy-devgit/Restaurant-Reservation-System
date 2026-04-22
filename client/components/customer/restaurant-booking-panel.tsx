@@ -14,6 +14,9 @@ export function RestaurantBookingPanel({
 }) {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [guestCount, setGuestCount] = useState(2);
+  const [serviceType, setServiceType] = useState<"dining" | "room-service" | "events">(
+    "dining",
+  );
   const [slot, setSlot] = useState("");
 
   const { data: restaurant, isLoading } = useQuery({
@@ -57,6 +60,23 @@ export function RestaurantBookingPanel({
         <p className="text-slate-600">{restaurant.location}</p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <label className="space-y-1 text-sm sm:col-span-2">
+            <span className="font-medium text-slate-700">Service</span>
+            <select
+              value={serviceType}
+              onChange={(event) =>
+                setServiceType(
+                  event.target.value as "dining" | "room-service" | "events",
+                )
+              }
+              className="w-full rounded-xl border border-slate-300 px-3 py-2"
+            >
+              <option value="dining">Dining Reservation</option>
+              <option value="room-service">Room Service Appointment</option>
+              <option value="events">Events Consultation</option>
+            </select>
+          </label>
+
           <label className="space-y-1 text-sm">
             <span className="font-medium text-slate-700">Date</span>
             <input
@@ -106,9 +126,12 @@ export function RestaurantBookingPanel({
           <p className="mt-4 text-slate-600">Checking...</p>
         ) : availabilityQuery.data?.available ? (
           <div className="mt-4 space-y-3">
+            <p className="text-sm text-slate-600">
+              Service: {serviceType.replace("-", " ")}
+            </p>
             <p className="text-emerald-700">Table available.</p>
             <Link
-              href={`/booking?restaurantId=${restaurant.id}&date=${date}&slot=${slot}&guests=${guestCount}`}
+              href={`/booking?restaurantId=${restaurant.id}&date=${date}&slot=${slot}&guests=${guestCount}&service=${serviceType}`}
               className="inline-flex rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
             >
               Continue Booking

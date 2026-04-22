@@ -1,29 +1,62 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f4ead4;
+  --foreground: #200707;
+  --surface: #f8f1e0;
+  --accent: #a4271f;
+  --accent-dark: #5a0606;
+  --outline: #d7c8ae;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-body);
+  --font-mono: "JetBrains Mono", "Consolas", monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #f8fafc;
-    --foreground: #0f172a;
+    --background: #f4ead4;
+    --foreground: #200707;
   }
 }
 
 body {
   background:
-    radial-gradient(circle at 10% 10%, #cffafe 0, transparent 26%),
-    radial-gradient(circle at 90% 20%, #d9f99d 0, transparent 24%),
-    linear-gradient(180deg, #f8fafc 0%, #ecfeff 100%);
+    radial-gradient(circle at 10% 10%, rgb(164 39 31 / 9%) 0, transparent 30%),
+    radial-gradient(circle at 90% 5%, rgb(90 6 6 / 10%) 0, transparent 28%),
+    linear-gradient(180deg, #f5ebd8 0%, #efe2cb 100%);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
+  font-family: var(--font-body), "Segoe UI", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+.display-font {
+  font-family: var(--font-display), "Times New Roman", serif;
+}
+
+.hotel-card {
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  box-shadow: 0 12px 30px rgb(32 7 7 / 7%);
+}
+
+.reveal-up {
+  animation: reveal-up 550ms ease-out both;
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

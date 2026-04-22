@@ -2,7 +2,9 @@ import {
   type QueryConstraint,
   Timestamp,
   collection,
+  deleteDoc,
   doc,
+  getDoc,
   getDocs,
   onSnapshot,
   orderBy,
@@ -24,9 +26,21 @@ import type {
 
 const reservationsCol = collection(db, "reservations");
 const tablesCol = collection(db, "tables");
+const reservationLocksCol = collection(db, "reservationLocks");
 
 type RawReservation = Omit<Reservation, "id" | "createdAt"> & {
   createdAt: Timestamp | null;
+};
+
+type ReservationHold = {
+  id: string;
+  restaurantId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  guestCount: number;
+  userId: string;
+  expiresAt: string;
 };
 
 function normalizeReservation(docId: string, data: RawReservation): Reservation {
@@ -100,6 +114,90 @@ export async function getReservationsByDate(
   );
 }
 
+export async function getReservationById(
+  reservationId: string,
+): Promise<Reservation | null> {
+  const reservationRef = doc(db, "reservations", reservationId);
+  const snapshot = await getDoc(reservationRef);
+
+  if (!snapshot.exists()) {
+    return null;
+  }
+
+  return normalizeReservation(snapshot.id, snapshot.data() as RawReservation);
+}
+
+export async function createReservationHold(input: {
+  restaurantId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  guestCount: number;
+  userId: string;
+  ttlMinutes?: number;
+}): Promise<ReservationHold> {
+  const expiresAt = new Date(
+    Date.now() + (input.ttlMinutes ?? 10) * 60_000,
+  ).toISOString();
+
+  const lockRef = doc(reservationLocksCol);
+
+  await runTransaction(db, async (transaction) => {
+    transaction.set(lockRef, {
+      restaurantId: input.restaurantId,
+      date: input.date,
+      startTime: input.startTime,
+      endTime: input.endTime,
+      guestCount: input.guestCount,
+      userId: input.userId,
+      expiresAt,
+      createdAt: serverTimestamp(),
+    });
+  });
+
+  return {
+    id: lockRef.id,
+    restaurantId: input.restaurantId,
+    date: input.date,
+    startTime: input.startTime,
+    endTime: input.endTime,
+    guestCount: input.guestCount,
+    userId: input.userId,
+    expiresAt,
+  };
+}
+
+export async function releaseReservationHold(holdId: string): Promise<void> {
+  await deleteDoc(doc(db, "reservationLocks", holdId));
+}
+
+async function validateReservationHold(
+  holdId: string | undefined,
+  userId: string,
+): Promise<void> {
+  if (!holdId) {
+    return;
+  }
+
+  const holdRef = doc(db, "reservationLocks", holdId);
+  const snapshot = await getDoc(holdRef);
+
+  if (!snapshot.exists()) {
+    throw new Error("Checkout hold expired. Please restart booking.");
+  }
+
+  const data = snapshot.data() as Omit<ReservationHold, "id">;
+
+  if (data.userId !== userId) {
+    throw new Error("Checkout hold does not match user session.");
+  }
+
+  if (new Date(data.expiresAt).getTime() < Date.now()) {
+    await deleteDoc(holdRef);
+    throw new Error("Checkout hold expired. Please restart booking.");
+  }
+}
+
 export async function checkAvailability(
   restaurantId: string,
   date: string,
@@ -133,8 +231,10 @@ export async function checkAvailability(
 }
 
 export async function createReservation(
-  payload: CreateReservationInput,
+  payload: CreateReservationInput & { holdId?: string },
 ): Promise<string> {
+  await validateReservationHold(payload.holdId, payload.userId);
+
   const tableChoice = payload.tableId
     ? { available: true, tableId: payload.tableId }
     : await checkAvailability(
@@ -183,15 +283,27 @@ export async function createReservation(
       tableId: tableChoice.tableId,
       userId: payload.userId,
       guestCount: payload.guestCount,
+      serviceType: payload.serviceType ?? "dining",
       date: payload.date,
       startTime: payload.startTime,
       endTime: payload.endTime,
       status: "confirmed",
+      paymentId: payload.paymentId ?? null,
+      extras: payload.extras ?? {
+        decoration: false,
+        cake: false,
+        airportPickup: false,
+      },
+      timezone: payload.timezone ?? "Africa/Addis_Ababa",
       createdAt: serverTimestamp(),
     });
 
     return newDocRef.id;
   });
+
+  if (payload.holdId) {
+    await releaseReservationHold(payload.holdId);
+  }
 
   return reservationId;
 }

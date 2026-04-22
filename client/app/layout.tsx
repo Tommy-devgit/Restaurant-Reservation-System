@@ -1,21 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const displayFont = Cormorant_Garamond({
+  variable: "--font-display",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const bodyFont = Plus_Jakarta_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Restaurant Reservation SaaS",
-  description: "Multi-tenant real-time table booking and admin dashboard",
+  title: "Grand Horizon Hotel | Dining, Room Service & Events",
+  description:
+    "Showcase and booking portal for one hotel experience with admin dashboard operations.",
 };
 
 export default function RootLayout({
@@ -26,7 +28,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${displayFont.variable} ${bodyFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>

@@ -16,7 +16,7 @@ export default function ReservationsPage() {
       {selectedRestaurantId ? (
         <ReservationsPanel restaurantId={selectedRestaurantId} />
       ) : (
-        <p className="text-slate-600">Select a restaurant.</p>
+        <p className="text-slate-700">Select a hotel profile.</p>
       )}
     </AppShell>
   );

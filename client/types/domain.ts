@@ -1,6 +1,14 @@
-export type UserRole = "admin" | "customer";
+export type UserRole = "guest" | "customer" | "admin" | "staff";
 
-export type ReservationStatus = "confirmed" | "cancelled";
+export type ReservationStatus = "pending" | "confirmed" | "cancelled";
+
+export type ServiceType = "dining" | "room-service" | "events";
+
+export type PaymentMethod = "card" | "mobile-money";
+
+export type PaymentStatus = "pending" | "success" | "failed" | "refunded";
+
+export type InventoryFeature = "wifi" | "ac" | "breakfast" | "city-view";
 
 export type TimeSlot = {
   startTime: string;
@@ -33,6 +41,17 @@ export type RestaurantTable = {
   restaurantId: string;
   tableNumber: string;
   capacity: number;
+  price?: number;
+  type?: string;
+  imageUrl?: string;
+  features?: InventoryFeature[];
+  description?: string;
+};
+
+export type ReservationExtras = {
+  decoration: boolean;
+  cake: boolean;
+  airportPickup: boolean;
 };
 
 export type Reservation = {
@@ -41,11 +60,44 @@ export type Reservation = {
   tableId: string;
   userId: string;
   guestCount: number;
+  serviceType?: ServiceType;
   date: string;
   startTime: string;
   endTime: string;
   status: ReservationStatus;
+  paymentId?: string | null;
+  extras?: ReservationExtras;
+  timezone?: string;
   createdAt: string;
+};
+
+export type PaymentRecord = {
+  id: string;
+  reservationId: string;
+  userId: string;
+  method: PaymentMethod;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  createdAt: string;
+};
+
+export type AvailabilitySlot = {
+  id: string;
+  restaurantId: string;
+  tableId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  available: boolean;
+};
+
+export type Promotion = {
+  id: string;
+  title: string;
+  code: string;
+  percentageOff: number;
+  active: boolean;
 };
 
 export type CreateReservationInput = {
@@ -53,7 +105,11 @@ export type CreateReservationInput = {
   tableId?: string;
   userId: string;
   guestCount: number;
+  serviceType?: ServiceType;
   date: string;
   startTime: string;
   endTime: string;
+  paymentId?: string;
+  extras?: ReservationExtras;
+  timezone?: string;
 };

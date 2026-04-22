@@ -52,16 +52,16 @@ export function CreateRestaurantPanel({
 
   return (
     <form onSubmit={onSubmit} className="max-w-2xl space-y-4 rounded-3xl border border-slate-200 bg-white p-6">
-      <h2 className="text-xl font-semibold text-slate-900">Create Restaurant Profile</h2>
+      <h2 className="text-xl font-semibold text-slate-900">Create Hotel Profile</h2>
 
       <input
         {...form.register("name")}
-        placeholder="Restaurant name"
+        placeholder="Hotel name"
         className="w-full rounded-xl border border-slate-300 px-3 py-2"
       />
       <input
         {...form.register("location")}
-        placeholder="Location"
+        placeholder="Address"
         className="w-full rounded-xl border border-slate-300 px-3 py-2"
       />
       <input
@@ -91,7 +91,7 @@ export function CreateRestaurantPanel({
         type="submit"
         className="rounded-full bg-cyan-600 px-5 py-2 font-semibold text-white hover:bg-cyan-700"
       >
-        Create Restaurant
+        Create Hotel
       </button>
     </form>
   );

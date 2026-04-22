@@ -17,7 +17,7 @@ export default function DashboardPage() {
       {selectedRestaurantId ? (
         <DashboardOverview restaurantId={selectedRestaurantId} date={date} />
       ) : (
-        <p className="text-slate-600">Create a restaurant first.</p>
+        <p className="text-slate-700">Create your hotel profile first.</p>
       )}
     </AppShell>
   );

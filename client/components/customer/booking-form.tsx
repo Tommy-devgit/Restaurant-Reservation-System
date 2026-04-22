@@ -29,6 +29,7 @@ export function BookingForm() {
       date: params.get("date") ?? "",
       slot: params.get("slot") ?? "",
       guests: Number(params.get("guests") ?? "2"),
+      service: params.get("service") ?? "dining",
     }),
     [params],
   );
@@ -65,7 +66,9 @@ export function BookingForm() {
       return id;
     },
     onSuccess: (reservationId) => {
-      router.push(`/confirmation?reservationId=${reservationId}`);
+      router.push(
+        `/confirmation?reservationId=${reservationId}&service=${defaults.service}`,
+      );
     },
   });
 
@@ -107,6 +110,7 @@ export function BookingForm() {
 
       <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
         <p>Restaurant ID: {defaults.restaurantId || "-"}</p>
+        <p>Service: {defaults.service || "dining"}</p>
         <p>Date: {defaults.date || "-"}</p>
         <p>Slot: {defaults.slot || "-"}</p>
       </div>

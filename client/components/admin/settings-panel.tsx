@@ -65,16 +65,16 @@ export function SettingsPanel({ restaurantId }: { restaurantId: string }) {
 
   return (
     <form onSubmit={onSubmit} className="max-w-2xl space-y-4 rounded-3xl border border-slate-200 bg-white p-6">
-      <h2 className="text-xl font-semibold text-slate-900">Restaurant Settings</h2>
+      <h2 className="text-xl font-semibold text-slate-900">Hotel Settings</h2>
 
       <input
         {...form.register("name")}
-        placeholder="Restaurant name"
+        placeholder="Hotel name"
         className="w-full rounded-xl border border-slate-300 px-3 py-2"
       />
       <input
         {...form.register("location")}
-        placeholder="Location"
+        placeholder="Address"
         className="w-full rounded-xl border border-slate-300 px-3 py-2"
       />
 
